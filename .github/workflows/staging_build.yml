@@ -1,0 +1,150 @@
+name: "Staging :: Build"
+
+on:
+  workflow_call:
+    inputs:
+      dry_run:
+        type: boolean
+        required: true
+      base_ref:
+        type: string
+        required: true
+      tag:
+        type: string
+        required: false
+        default: "0.0.0"
+      commit_sha:
+        type: string
+        required: false
+        default: "main"
+      download_asset_url:
+        type: string
+        required: false
+        default: ""
+      upload_asset_url:
+        type: string
+        required: false
+        default: ""
+    secrets:
+      kie_group_tools_token:
+        required: false
+      gh_token:
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DASHBUILDER__viewerImageRegistry: "quay.io"
+      DASHBUILDER__viewerImageAccount: "kie-tools"
+      DASHBUILDER__viewerImageName: "dashbuilder-viewer-image"
+      DASHBUILDER__viewerImageBuildTags: "${{ inputs.tag }}-prerelease"
+      SERVERLESS_LOGIC_WEB_TOOLS__dashbuilderViewerImageTag: "${{ inputs.tag }}-prerelease"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageRegistry: "quay.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageAccount: "kie-tools"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageName: "serverless-logic-web-tools-swf-builder-image"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageTag: "${{ inputs.tag }}-prerelease"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageBuildTags: "${{ inputs.tag }}-prerelease"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageRegistry: "quay.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageAccount: "kie-tools"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageName: "serverless-logic-web-tools-base-builder-image"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageTag: "${{ inputs.tag }}-prerelease"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageBuildTags: "${{ inputs.tag }}-prerelease"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageRegistry: "quay.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageAccount: "kie-tools"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageName: "serverless-logic-web-tools-swf-dev-mode-image"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageTag: "${{ inputs.tag }}-prerelease"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageBuildTags: "${{ inputs.tag }}-prerelease"
+
+    steps:
+      - name: "Checkout kie-tools"
+        uses: actions/checkout@v3
+        with:
+          path: kie-tools
+          repository: apache/incubator-kie-tools
+
+      - name: "Checkout serverless-logic-sandbox-deployment"
+        uses: actions/checkout@v3
+        with:
+          path: ${{ github.workspace }}/serverless-logic-sandbox-deployment
+          fetch-depth: 0
+          token: ${{ secrets.kie_group_tools_token }}
+          repository: kiegroup/serverless-logic-sandbox-deployment
+          ref: gh-pages
+
+      # Skipped MacOS and Windows due to 120s timeout being reached while running hashFiles('**/pom.xml')
+      # Remove condition after timeout parameter is available
+      # https://github.com/actions/runner/issues/1840
+      # https://github.com/actions/runner/pull/1844
+      - name: "Cache Maven packages (Ubuntu only - see comments in source)"
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-staging-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-staging-m2
+
+      - name: "Setup environment"
+        uses: ./kie-tools/.github/actions/setup-env
+        with:
+          working_dir: kie-tools
+
+      - name: "Bootstrap"
+        id: bootstrap
+        uses: ./kie-tools/.github/actions/bootstrap
+        with:
+          working_dir: kie-tools
+          pnpm_filter_string: -F @kie-tools/serverless-logic-web-tools...
+
+      - name: "Build"
+        working-directory: ${{ github.workspace }}/kie-tools
+        env:
+          KIE_TOOLS_BUILD__runEndToEndTests: "false"
+          KIE_TOOLS_BUILD__runTests: "false"
+          KIE_TOOLS_BUILD__runLinters: "false"
+          KIE_TOOLS_BUILD__buildContainerImages: "false"
+
+          WEBPACK__minimize: "true"
+          WEBPACK__tsLoaderTranspileOnly: "false"
+
+          SERVERLESS_LOGIC_WEB_TOOLS__version: "${{ inputs.tag }}-prerelease"
+          SERVERLESS_LOGIC_WEB_TOOLS__samplesRepositoryRef: "${{ inputs.tag }}"
+          SERVERLESS_LOGIC_WEB_TOOLS__buildInfo: "${{ inputs.tag }} (staging) @ ${{ inputs.commit_sha }}"
+          SERVERLESS_LOGIC_WEB_TOOLS__corsProxyUrl: "https://staging-cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud"
+        run: >-
+          pnpm ${{ steps.bootstrap.outputs.pnpm_filter_string }} --workspace-concurrency=1 build:prod
+
+      - name: "STAGING: Deploy Serverless Logic Web Tools to serverless-logic-sandbox-deployment"
+        if: ${{ !inputs.dry_run }}
+        working-directory: ${{ github.workspace }}/serverless-logic-sandbox-deployment
+        env:
+          DEPLOYMENT_DIR: staging/${{ inputs.tag }}-prerelease
+        run: |
+          echo "Reset deployment dir"
+          rm -rf $DEPLOYMENT_DIR
+
+          echo "Copy Serverless Logic Web Tools resources to the deployment dir"
+          cp -r ${{ github.workspace }}/kie-tools/packages/serverless-logic-web-tools/dist $DEPLOYMENT_DIR
+
+          echo "Commit changes and push"
+          git add $DEPLOYMENT_DIR
+          git commit -m "Deploy ${{ inputs.tag }}-prerelease (staging)"
+          git push origin gh-pages
+
+          echo "Clean up serverless-logic-sandbox-deployment dir"
+          rm -rf *
+
+      - name: "STAGING: Compress Serverless Logic Web Tools"
+        working-directory: ${{ github.workspace }}/kie-tools/packages/serverless-logic-web-tools
+        run: |
+          zip -r dist.zip dist/*
+
+      - name: "STAGING: Upload Serverless Logic Web Tools"
+        if: ${{ !inputs.dry_run }}
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.gh_token }}
+        with:
+          upload_url: ${{ inputs.upload_asset_url }}
+          asset_path: ${{ github.workspace }}/kie-tools/packages/serverless-logic-web-tools/dist.zip
+          asset_name: STAGING__serverless_logic_web_tools_${{ inputs.tag }}.zip
+          asset_content_type: application/zip

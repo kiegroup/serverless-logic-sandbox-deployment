@@ -1,0 +1,64 @@
+name: "Release :: Publish"
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        required: true
+        description: "Tag associated with the release"
+      runners:
+        type: string
+        required: true
+        description: "Jobs to run (JSON)"
+        default: '{"serverless_logic_web_tools":"true"}'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_asset_url: ${{ fromJSON(steps.fetch_release_for_tag.outputs.data).upload_url }}
+      release_ref: ${{ fromJSON(steps.fetch_release_for_tag.outputs.data).target_commitish }}
+    steps:
+      - name: "Fetch release for ${{ github.event.inputs.tag }}"
+        uses: octokit/request-action@v2.1.0
+        id: fetch_release_for_tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          route: GET /repos/{repo}/releases/tags/{tag}
+          repo: ${{ github.repository }}
+          tag: ${{ github.event.inputs.tag }}
+
+      - name: "Checkout kie-tools"
+        uses: actions/checkout@v3
+        with:
+          path: kie-tools
+          repository: apache/incubator-kie-tools
+          ref: ${{ fromJSON(steps.fetch_release_for_tag.outputs.data).target_commitish }}
+
+      - name: "Check `tag` against `(package.json).version`"
+        shell: bash
+        run: |
+          cd kie-tools
+          [ "${{ github.event.inputs.tag }}" == "$(node -p "require('./package.json').version")" ]
+          cd -
+
+      - name: "Checkout serverless-logic-sandbox-deployment"
+        uses: actions/checkout@v3
+        with:
+          path: serverless-logic-sandbox-deployment
+          repository: kiegroup/serverless-logic-sandbox-deployment
+
+  build_and_publish:
+    needs: [prepare]
+    uses: ./.github/workflows/release_build.yml
+    with:
+      dry_run: false
+      base_ref: ${{ needs.prepare.outputs.release_ref }}
+      tag: ${{ github.event.inputs.tag }}
+      upload_asset_url: ${{ needs.prepare.outputs.upload_asset_url }}
+      runners: ${{ github.event.inputs.runners }}
+    secrets:
+      kie_group_tools_token: ${{ secrets.KIE_GROUP_TOOLS_TOKEN }}
+      gh_token: ${{ secrets.GITHUB_TOKEN }}

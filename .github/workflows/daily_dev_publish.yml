@@ -1,0 +1,111 @@
+name: "Daily dev :: Publish"
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # 4am UTC everyday
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/daily_dev_publish.yml"
+
+concurrency:
+  group: ${{ github.event.pull_request && format('daily-dev-publish-pr-{0}', github.event.pull_request.number) || format('daily-dev-publish-ref-{0}', github.ref_name) }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.repository == 'kiegroup/serverless-logic-sandbox-deployment'
+    runs-on: ubuntu-latest
+    env:
+      KIE_TOOLS_BUILD__buildContainerImages: "false"
+      KIE_TOOLS_BUILD__runLinters: "false"
+      KIE_TOOLS_BUILD__runTests: "false"
+      KIE_TOOLS_BUILD__runEndToEndTests: "false"
+
+      DASHBUILDER__viewerImageRegistry: "quay.io"
+      DASHBUILDER__viewerImageAccount: "kie-tools"
+      DASHBUILDER__viewerImageName: "dashbuilder-viewer-image"
+      DASHBUILDER__viewerImageBuildTags: "daily-dev"
+      SERVERLESS_LOGIC_WEB_TOOLS__dashbuilderViewerImageTag: "daily-dev"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageRegistry: "quay.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageAccount: "kie-tools"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageName: "serverless-logic-web-tools-swf-builder-image"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageTag: "daily-dev"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageBuildTags: "daily-dev"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageRegistry: "quay.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageAccount: "kie-tools"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageName: "serverless-logic-web-tools-base-builder-image"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageTag: "daily-dev"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageBuildTags: "daily-dev"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageRegistry: "quay.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageAccount: "kie-tools"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageName: "serverless-logic-web-tools-swf-dev-mode-image"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageTag: "daily-dev"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageBuildTags: "daily-dev"
+      SERVERLESS_LOGIC_WEB_TOOLS__corsProxyUrl: "https://daily-dev-cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud"
+
+    steps:
+      - name: "Clone kie-tools"
+        uses: actions/checkout@v3
+        with:
+          path: kie-tools
+          repository: apache/incubator-kie-tools
+
+      # This bash script will set an output version for this step. It can be used with steps.version.outputs.version
+      - name: "Output version"
+        id: version
+        run: |
+          cd kie-tools
+          echo "version=$(node -e "console.log(require('./package.json').version);")" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: "Cache Maven packages"
+        if: github.event_name != 'pull_request'
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-daily-dev-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-daily-dev-m2
+
+      - name: "Setup environment"
+        uses: ./kie-tools/.github/actions/setup-env
+        with:
+          working_dir: kie-tools
+
+      - name: "Bootstrap"
+        id: bootstrap
+        uses: ./kie-tools/.github/actions/bootstrap
+        with:
+          working_dir: kie-tools
+
+      - name: "Build serverless-logic-web-tools"
+        env:
+          WEBPACK__minimize: "true"
+          WEBPACK__tsLoaderTranspileOnly: "false"
+          DISPLAY: ":99.0"
+          SERVERLESS_LOGIC_WEB_TOOLS__buildInfo: "${{ steps.version.outputs.version }} (daily-dev) @ ${{ github.sha }}"
+        run: |
+          cd kie-tools
+          pnpm -F @kie-tools/serverless-logic-web-tools... build:prod
+
+      - name: "Checkout serverless-logic-sandbox-deployment"
+        uses: actions/checkout@v3
+        with:
+          token: ${{ github.event_name != 'pull_request' && secrets.KIE_GROUP_TOOLS_TOKEN || secrets.GITHUB_TOKEN }}
+          path: serverless-logic-sandbox-deployment
+          repository: kiegroup/serverless-logic-sandbox-deployment
+          ref: gh-pages
+
+      - name: "Update serverless-logic-sandbox-deployment resources"
+        if: github.event_name != 'pull_request'
+        run: |
+          cd serverless-logic-sandbox-deployment
+          rm -rf dev
+          mkdir dev
+          cp -r ../kie-tools/packages/serverless-logic-web-tools/dist/* dev/
+          git config --global user.email "kie-group-tools@googlegroups.com"
+          git config --global user.name "KIE Group Tools (kie-group-tools)"
+          today=$(date -I)
+          git add . && git commit -m "KIE Tools Daily Dev Build resources - $today" || echo "No changes."
+          git push origin gh-pages
+          cd -
