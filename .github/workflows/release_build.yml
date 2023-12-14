@@ -85,12 +85,6 @@ jobs:
           path: kie-tools
           repository: apache/incubator-kie-tools
 
-      - name: "Checkout @ Simulated squashed-merge if PR"
-        uses: ./kie-tools/.github/actions/checkout-pr
-        with:
-          ref: ${{ inputs.base_ref }}
-          path: kie-tools
-
       - name: "Checkout serverless-logic-sandbox-deployment"
         if: ${{ !inputs.dry_run }}
         uses: actions/checkout@v3
