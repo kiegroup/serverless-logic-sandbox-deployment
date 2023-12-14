@@ -8,6 +8,7 @@ on:
     branches: ["**"]
     paths:
       - ".github/workflows/release*"
+      - ".github/actions/**"
 
 concurrency:
   group: ${{ github.event.pull_request && format('release-dry-run-pr-{0}', github.event.pull_request.number) || format('release-dry-run-ref-{0}', github.ref_name) }}

@@ -1,4 +1,4 @@
-name: "Setup Apache KIE Tools build environment"
+name: "Setup build environment"
 description: ""
 
 inputs:

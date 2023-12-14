@@ -60,6 +60,7 @@ jobs:
           repository: apache/incubator-kie-tools
 
       - name: "Checkout serverless-logic-sandbox-deployment"
+        if: ${{ !inputs.dry_run }}
         uses: actions/checkout@v3
         with:
           path: ${{ github.workspace }}/serverless-logic-sandbox-deployment
