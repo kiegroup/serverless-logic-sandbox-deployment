@@ -74,11 +74,18 @@ jobs:
         with:
           working_dir: kie-tools
 
+      - name: "Parse `commit_sha`"
+        id: commit_sha
+        shell: bash
+        run: |
+          cd kie-tools
+          echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
       - name: "Build serverless-logic-web-tools"
         env:
           WEBPACK__minimize: "true"
           WEBPACK__tsLoaderTranspileOnly: "false"
-          SERVERLESS_LOGIC_WEB_TOOLS__buildInfo: "${{ steps.version.outputs.version }} (daily-dev) @ ${{ github.sha }}"
+          SERVERLESS_LOGIC_WEB_TOOLS__buildInfo: "${{ steps.version.outputs.version }} (daily-dev) @ ${{ steps.commit_sha.outputs.commit_sha }}"
         run: |
           cd kie-tools
           pnpm -F @kie-tools/serverless-logic-web-tools... build:prod
