@@ -36,7 +36,7 @@ jobs:
       SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageTag: "daily-dev"
       SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageRegistry: "docker.io"
       SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageAccount: "apache"
-      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageName: "incubator-serverless-logic-web-tools-swf-dev-mode"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageName: "incubator-kie-serverless-logic-web-tools-swf-dev-mode"
       SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageTag: "daily-dev"
       SERVERLESS_LOGIC_WEB_TOOLS__corsProxyUrl: "https://daily-dev-cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud"
 
