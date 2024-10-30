@@ -35,21 +35,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DASHBUILDER__viewerImageRegistry: "quay.io"
-      DASHBUILDER__viewerImageAccount: "kie-tools"
-      DASHBUILDER__viewerImageName: "dashbuilder-viewer-image"
+      DASHBUILDER__viewerImageRegistry: "docker.io"
+      DASHBUILDER__viewerImageAccount: "apache"
+      DASHBUILDER__viewerImageName: "incubator-kie-dashbuilder-viewer"
       SERVERLESS_LOGIC_WEB_TOOLS__dashbuilderViewerImageTag: "${{ inputs.tag }}-prerelease"
-      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageRegistry: "quay.io"
-      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageAccount: "kie-tools"
-      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageName: "serverless-logic-web-tools-swf-builder-image"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageRegistry: "docker.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageAccount: "apache"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageName: "incubator-kie-serverless-logic-web-tools-swf-builder"
       SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageTag: "${{ inputs.tag }}-prerelease"
-      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageRegistry: "quay.io"
-      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageAccount: "kie-tools"
-      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageName: "serverless-logic-web-tools-base-builder-image"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageRegistry: "docker.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageAccount: "apache"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageName: "incubator-kie-serverless-logic-web-tools-base-builder"
       SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageTag: "${{ inputs.tag }}-prerelease"
-      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageRegistry: "quay.io"
-      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageAccount: "kie-tools"
-      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageName: "serverless-logic-web-tools-swf-dev-mode-image"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageRegistry: "docker.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageAccount: "apache"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageName: "incubator-kie-serverless-logic-web-tools-swf-dev-mode"
       SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageTag: "${{ inputs.tag }}-prerelease"
 
     steps:
