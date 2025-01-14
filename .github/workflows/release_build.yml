@@ -57,20 +57,20 @@ jobs:
       SERVERLESS_LOGIC_WEB_TOOLS__version: "${{ inputs.tag }}"
       SERVERLESS_LOGIC_WEB_TOOLS__samplesRepositoryRef: "${{ inputs.tag }}"
       SERVERLESS_LOGIC_WEB_TOOLS__buildInfo: ""
-      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageRegistry: "docker.io"
-      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageAccount: "apache"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageRegistry: "quay.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageAccount: "kubesmarts"
       SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageName: "incubator-kie-serverless-logic-web-tools-swf-builder"
       SERVERLESS_LOGIC_WEB_TOOLS__swfBuilderImageTag: "${{ inputs.tag }}"
-      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageRegistry: "docker.io"
-      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageAccount: "apache"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageRegistry: "quay.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageAccount: "kubesmarts"
       SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageName: "incubator-kie-serverless-logic-web-tools-base-builder"
       SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageTag: "${{ inputs.tag }}"
-      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageRegistry: "docker.io"
-      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageAccount: "apache"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageRegistry: "quay.io"
+      SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageAccount: "kubesmarts"
       SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageName: "incubator-kie-serverless-logic-web-tools-swf-dev-mode"
       SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageTag: "${{ inputs.tag }}"
-      DASHBUILDER__viewerImageRegistry: "docker.io"
-      DASHBUILDER__viewerImageAccount: "apache"
+      DASHBUILDER__viewerImageRegistry: "quay.io"
+      DASHBUILDER__viewerImageAccount: "kubesmarts"
       DASHBUILDER__viewerImageName: "incubator-kie-dashbuilder-viewer"
       SERVERLESS_LOGIC_WEB_TOOLS__dashbuilderViewerImageTag: "${{ inputs.tag }}"
       SERVERLESS_LOGIC_WEB_TOOLS__corsProxyUrl: "https://cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud"
@@ -83,7 +83,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: kie-tools
-          repository: apache/incubator-kie-tools
+          repository: kubesmarts/kie-tools
 
       - name: "Checkout serverless-logic-sandbox-deployment"
         if: ${{ !inputs.dry_run }}
