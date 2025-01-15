@@ -104,6 +104,8 @@ jobs:
           WEBPACK__tsLoaderTranspileOnly: "false"
 
           SERVERLESS_LOGIC_WEB_TOOLS__version: "${{ inputs.tag }}-prerelease"
+          SERVERLESS_LOGIC_WEB_TOOLS__samplesRepositoryOrg: "kubesmarts" 
+          SERVERLESS_LOGIC_WEB_TOOLS__samplesRepositoryName: "sandbox-catalog"
           SERVERLESS_LOGIC_WEB_TOOLS__samplesRepositoryRef: "${{ inputs.tag }}"
           SERVERLESS_LOGIC_WEB_TOOLS__buildInfo: "${{ inputs.tag }} (staging) @ ${{ inputs.commit_sha }}"
           SERVERLESS_LOGIC_WEB_TOOLS__corsProxyUrl: "https://staging-cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud"
