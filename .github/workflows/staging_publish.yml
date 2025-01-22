@@ -26,8 +26,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: kie-tools
-          repository: apache/incubator-kie-tools
-          ref: ${{ github.event.inputs.version }}-prerelease
+          repository: ${{ vars.KIE_TOOLS_REPO }}
+          ref: ${{ github.event.inputs.version }}
 
       - name: "Parse `commit_sha`"
         id: release_draft_commit_sha
@@ -63,7 +63,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: serverless-logic-sandbox-deployment
-          repository: kiegroup/serverless-logic-sandbox-deployment
+          repository: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO }}
 
   build_and_publish:
     needs: [create_release]

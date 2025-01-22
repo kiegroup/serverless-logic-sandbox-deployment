@@ -85,7 +85,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: kie-tools
-          repository: kubesmarts/kie-tools
+          repository: ${{ vars.KIE_TOOLS_REPO }}
 
       - name: "Checkout serverless-logic-sandbox-deployment"
         if: ${{ !inputs.dry_run }}
@@ -94,7 +94,7 @@ jobs:
           path: ${{ github.workspace }}/serverless-logic-sandbox-deployment
           fetch-depth: 0
           token: ${{ secrets.kie_group_tools_token }}
-          repository: kiegroup/serverless-logic-sandbox-deployment
+          repository: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO }}
           ref: gh-pages
 
       - name: "Cache Maven packages"
