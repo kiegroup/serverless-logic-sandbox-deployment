@@ -103,7 +103,7 @@ jobs:
           WEBPACK__minimize: "true"
           WEBPACK__tsLoaderTranspileOnly: "false"
 
-          SERVERLESS_LOGIC_WEB_TOOLS__version: "${{ inputs.tag }}-prerelease"
+          SERVERLESS_LOGIC_WEB_TOOLS__version: "${{ inputs.tag }}"
           SERVERLESS_LOGIC_WEB_TOOLS__samplesRepositoryOrg: "kubesmarts" 
           SERVERLESS_LOGIC_WEB_TOOLS__samplesRepositoryName: "sandbox-catalog"
           SERVERLESS_LOGIC_WEB_TOOLS__samplesRepositoryRef: "${{ inputs.tag }}"
@@ -116,7 +116,7 @@ jobs:
         if: ${{ !inputs.dry_run }}
         working-directory: ${{ github.workspace }}/serverless-logic-sandbox-deployment
         env:
-          DEPLOYMENT_DIR: staging/${{ inputs.tag }}-prerelease
+          DEPLOYMENT_DIR: staging/${{ inputs.tag }}
         run: |
           echo "Reset deployment dir"
           rm -rf $DEPLOYMENT_DIR
@@ -126,7 +126,7 @@ jobs:
 
           echo "Commit changes and push"
           git add $DEPLOYMENT_DIR
-          git commit -m "Deploy ${{ inputs.tag }}-prerelease (staging)"
+          git commit -m "Deploy ${{ inputs.tag }} (staging)"
           git push origin gh-pages
 
           echo "Clean up serverless-logic-sandbox-deployment dir"
