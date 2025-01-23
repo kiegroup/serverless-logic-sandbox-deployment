@@ -12,6 +12,10 @@ concurrency:
   group: staging-publish
   cancel-in-progress: true
 
+env:
+  KIE_TOOLS_REPO: ${{ vars.KIE_TOOLS_REPO || 'kubesmarts/kie-tools' }}
+  SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO || 'kiegroup/serverless-logic-sandbox-deployment' }}
+
 jobs:
   create_release:
     runs-on: ubuntu-latest
@@ -26,7 +30,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: kie-tools
-          repository: ${{ vars.KIE_TOOLS_REPO }}
+          repository: ${{ env.KIE_TOOLS_REPO }}
           ref: ${{ github.event.inputs.version }}
 
       - name: "Parse `commit_sha`"
@@ -63,7 +67,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: serverless-logic-sandbox-deployment
-          repository: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO }}
+          repository: ${{ env.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO }}
 
   build_and_publish:
     needs: [create_release]

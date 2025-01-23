@@ -13,6 +13,10 @@ on:
         description: "Jobs to run (JSON)"
         default: '{"serverless_logic_web_tools":"true"}'
 
+env:
+  KIE_TOOLS_REPO: ${{ vars.KIE_TOOLS_REPO || 'kubesmarts/kie-tools' }}
+  SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO || 'kiegroup/serverless-logic-sandbox-deployment' }}
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -34,7 +38,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: kie-tools
-          repository: ${{ vars.KIE_TOOLS_REPO }}
+          repository: ${{ env.KIE_TOOLS_REPO }}
           ref: ${{ fromJSON(steps.fetch_release_for_tag.outputs.data).target_commitish }}
 
       - name: "Check `tag` against `(package.json).version`"
@@ -48,7 +52,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: serverless-logic-sandbox-deployment
-          repository: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO }}
+          repository: ${{ env.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO }}
 
   build_and_publish:
     needs: [prepare]

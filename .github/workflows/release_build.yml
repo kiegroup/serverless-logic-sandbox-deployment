@@ -28,6 +28,8 @@ on:
         required: false
 
 env:
+  KIE_TOOLS_REPO: ${{ vars.KIE_TOOLS_REPO || 'kubesmarts/kie-tools' }}
+  SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO || 'kiegroup/serverless-logic-sandbox-deployment' }}
   KIE_TOOLS_BUILD__runLinters: "false"
   KIE_TOOLS_BUILD__runTests: "false"
   KIE_TOOLS_BUILD__runEndToEndTests: "false"
@@ -85,7 +87,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: kie-tools
-          repository: ${{ vars.KIE_TOOLS_REPO }}
+          repository: ${{ env.KIE_TOOLS_REPO }}
 
       - name: "Checkout serverless-logic-sandbox-deployment"
         if: ${{ !inputs.dry_run }}
@@ -94,7 +96,7 @@ jobs:
           path: ${{ github.workspace }}/serverless-logic-sandbox-deployment
           fetch-depth: 0
           token: ${{ secrets.kie_group_tools_token }}
-          repository: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO }}
+          repository: ${{ env.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO }}
           ref: gh-pages
 
       - name: "Cache Maven packages"
