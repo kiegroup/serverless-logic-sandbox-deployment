@@ -134,6 +134,8 @@ jobs:
           rm -rf -- !("dev"|"staging"|".nojekyll"|"CNAME"|"0.25.0"|"schemas")
           echo "Copy resources"
           cp -r ${{ github.workspace }}/kie-tools/packages/serverless-logic-web-tools/dist/* .
+          git config --global user.email "kie-group-tools@googlegroups.com"
+          git config --global user.name "KIE Group Tools (kie-group-tools)"
           echo "Commit changes and push"
           git add .
           git commit -m "Deploy ${{ inputs.tag }}"

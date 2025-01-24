@@ -127,7 +127,8 @@ jobs:
 
           echo "Copy Serverless Logic Web Tools resources to the deployment dir"
           cp -r ${{ github.workspace }}/kie-tools/packages/serverless-logic-web-tools/dist $DEPLOYMENT_DIR
-
+          git config --global user.email "kie-group-tools@googlegroups.com"
+          git config --global user.name "KIE Group Tools (kie-group-tools)"
           echo "Commit changes and push"
           git add $DEPLOYMENT_DIR
           git commit -m "Deploy ${{ inputs.tag }} (staging)"
