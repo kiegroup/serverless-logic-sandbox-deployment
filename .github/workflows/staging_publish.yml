@@ -38,7 +38,9 @@ jobs:
       - name: "Check `version` against `package.json.version`"
         shell: bash
         run: |
+          cd kie-tools
           [ "${{ github.event.inputs.version }}" == "$(node -p "require('./package.json').version")" ]
+          cd -
 
       - name: "Create Release (draft)"
         id: create_release_draft
