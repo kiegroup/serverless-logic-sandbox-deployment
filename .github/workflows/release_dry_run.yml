@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   dry_run:
-    if: github.repository == 'kiegroup/serverless-logic-sandbox-deployment'
+    if: github.repository == vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO
     uses: ./.github/workflows/release_build.yml
     with:
       dry_run: true
