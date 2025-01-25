@@ -129,10 +129,13 @@ jobs:
           fi
           echo "DEPLOYMENT_DIR=$DEPLOYMENT_DIR"
           cd serverless-logic-sandbox-deployment
-          shopt -s extglob
-          rm -rf -- !("dev"|"staging"|".nojekyll"|"CNAME"|"0.25.0"|"schemas")
-          rm -rf $DEPLOYMENT_DIR
-          mkdir -p $DEPLOYMENT_DIR
+          if [ "${{ inputs.environment }}" == "prod" ]; then
+            shopt -s extglob
+            rm -rf -- !("dev"|"staging"|".nojekyll"|"CNAME"|"0.25.0"|"schemas")
+          else
+            rm -rf $DEPLOYMENT_DIR
+            mkdir -p $DEPLOYMENT_DIR
+          fi
           cp -r ../kie-tools/packages/serverless-logic-web-tools/dist/* $DEPLOYMENT_DIR
           git config --global user.email "kie-group-tools@googlegroups.com"
           git config --global user.name "KIE Group Tools (kie-group-tools)"
