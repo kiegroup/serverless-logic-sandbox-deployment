@@ -23,12 +23,7 @@ on:
 env:
   KIE_TOOLS_REPO: ${{ vars.KIE_TOOLS_REPO || 'kubesmarts/kie-tools' }}
   SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO || 'kiegroup/serverless-logic-sandbox-deployment' }}
-  DEPLOYMENT_DIR: ${{ 
-    (inputs.environment == 'dev' &&  "dev" ) ||
-    (inputs.environment == 'staging' &&  "staging/${{ inputs.tag }}" ) ||
-    "."
-  }}
-
+  DEPLOYMENT_DIR: ${{ (inputs.environment == 'dev' &&  "dev" ) || (inputs.environment == 'staging' &&  "staging/${{ inputs.tag }}" ) || "." }}
   DASHBUILDER__viewerImageAccount: "kubesmarts"
   DASHBUILDER__viewerImageName: "incubator-kie-dashbuilder-viewer"
   DASHBUILDER__viewerImageRegistry: "quay.io"
@@ -41,11 +36,7 @@ env:
   SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageRegistry: "quay.io"
   SERVERLESS_LOGIC_WEB_TOOLS__baseBuilderImageTag: "${{ inputs.tag }}"
   SERVERLESS_LOGIC_WEB_TOOLS__buildInfo: ""
-  SERVERLESS_LOGIC_WEB_TOOLS__corsProxyUrl: ${{ 
-    (inputs.environment == 'dev' &&  "https://daily-dev-cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud" ) ||
-    (inputs.environment == 'staging' &&  "https://staging-cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud" ) ||
-    "https://cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud"
-  }}
+  SERVERLESS_LOGIC_WEB_TOOLS__corsProxyUrl: ${{ (inputs.environment == 'dev' &&  "https://daily-dev-cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud" ) || (inputs.environment == 'staging' &&  "https://staging-cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud" ) || "https://cors-proxy-kie-sandbox.rhba-0ad6762cc85bcef5745bb684498c2436-0000.us-south.containers.appdomain.cloud" }}
   SERVERLESS_LOGIC_WEB_TOOLS__dashbuilderViewerImageTag: "${{ inputs.tag }}"
   SERVERLESS_LOGIC_WEB_TOOLS__samplesRepositoryName: "sandbox-catalog"
   SERVERLESS_LOGIC_WEB_TOOLS__samplesRepositoryOrg: "kubesmarts" 
