@@ -49,6 +49,7 @@ env:
   SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageName: "incubator-kie-serverless-logic-web-tools-swf-dev-mode"
   SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageRegistry: "quay.io"
   SERVERLESS_LOGIC_WEB_TOOLS__swfDevModeImageTag: "${{ inputs.tag }}"
+  SERVERLESS_LOGIC_WEB_TOOLS__version: ${{ (inputs.environment == 'dev' && '0.0.0') || inputs.tag }}
   SERVERLESS_LOGIC_WEB_TOOLS__version: "${{ inputs.tag }}"
   WEBPACK__minimize: "true"
   WEBPACK__tsLoaderTranspileOnly: "false"
