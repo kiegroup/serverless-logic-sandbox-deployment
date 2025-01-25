@@ -130,7 +130,7 @@ jobs:
           echo "DEPLOYMENT_DIR=$DEPLOYMENT_DIR"
           cd serverless-logic-sandbox-deployment
           rm -rf $DEPLOYMENT_DIR
-          mkdir $DEPLOYMENT_DIR
+          mkdir -p $DEPLOYMENT_DIR
           cp -r ../kie-tools/packages/serverless-logic-web-tools/dist/* $DEPLOYMENT_DIR
           git config --global user.email "kie-group-tools@googlegroups.com"
           git config --global user.name "KIE Group Tools (kie-group-tools)"
