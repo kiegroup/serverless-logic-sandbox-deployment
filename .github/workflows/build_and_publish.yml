@@ -100,9 +100,13 @@ jobs:
           echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: "Build serverless-logic-web-tools"
-        env:
-          SERVERLESS_LOGIC_WEB_TOOLS__buildInfo: ${{ (inputs.environment == 'dev' && '${{ steps.version.outputs.version }} (daily-dev) @ ${{ steps.commit_sha.outputs.commit_sha }}' ) || (inputs.environment == 'staging' && '${{ inputs.tag }} (staging) @ ${{ steps.commit_sha.outputs.commit_sha }}') }}
         run: |
+          if [ "${{ inputs.environment }}" = "dev" ]; then
+            export SERVERLESS_LOGIC_WEB_TOOLS__buildInfo="${{ steps.version.outputs.version }} (daily-dev) @ ${{ steps.commit_sha.outputs.commit_sha }}"
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            export SERVERLESS_LOGIC_WEB_TOOLS__buildInfo="${{ inputs.tag }} (staging) @ ${{ steps.commit_sha.outputs.commit_sha }}"
+          fi
+          echo "SERVERLESS_LOGIC_WEB_TOOLS__buildInfo=$SERVERLESS_LOGIC_WEB_TOOLS__buildInfo"
           cd kie-tools
           pnpm -F @kie-tools/serverless-logic-web-tools... build:prod
 
