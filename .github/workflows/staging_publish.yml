@@ -2,74 +2,83 @@ name: "Staging :: Publish"
 
 on:
   workflow_dispatch:
+    # inputs:
+    #   version:
+    #     type: string
+    #     required: true
+    #     description: "Version associated with the release"
     inputs:
-      version:
-        type: string
+      environment:
+        description: Environment for the workflow (dev, staging, prod)
         required: true
-        description: "Version associated with the release"
+        default: staging
+      tag:
+        description: Tag to build
+        required: true
+        default: main
 
 concurrency:
   group: staging-publish
   cancel-in-progress: true
 
-env:
-  KIE_TOOLS_REPO: ${{ vars.KIE_TOOLS_REPO || 'kubesmarts/kie-tools' }}
-  SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO || 'kiegroup/serverless-logic-sandbox-deployment' }}
+# env:
+#   KIE_TOOLS_REPO: ${{ vars.KIE_TOOLS_REPO || 'kubesmarts/kie-tools' }}
+#   SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO || 'kiegroup/serverless-logic-sandbox-deployment' }}
 
-jobs:
-  create_release:
-    runs-on: ubuntu-latest
-    outputs:
-      upload_asset_url: ${{ steps.create_release_draft.outputs.upload_url }}
-      html_url: ${{ steps.create_release_draft.outputs.html_url }}
-      id: ${{ steps.create_release_draft.outputs.id }}
-      commit_sha: ${{ steps.release_draft_commit_sha.outputs.commit_sha }}
-      download_asset_url: ${{ steps.release_json_ext.outputs.download_url }}
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v3
-        with:
-          path: kie-tools
-          repository: ${{ env.KIE_TOOLS_REPO }}
-          ref: ${{ github.event.inputs.version }}
-
-      - name: "Parse `commit_sha`"
-        id: release_draft_commit_sha
-        shell: bash
-        run: |
-          echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-
-      - name: "Check `version` against `package.json.version`"
-        shell: bash
-        run: |
-          cd kie-tools
-          [ "${{ github.event.inputs.version }}" == "$(node -p "require('./package.json').version")" ]
-          cd -
-
-      - name: "Create Release (draft)"
-        id: create_release_draft
-        uses: actions/create-release@v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.event.inputs.version }}
-          release_name: ${{ github.event.inputs.version }} (alpha)
-          commitish: ${{ github.ref }}
-          draft: true
-          prerelease: true
-
-      - name: "Generate download URL for Release assets"
-        id: release_json_ext
-        shell: bash
-        run: |
-          url=$(echo ${{ steps.create_release_draft.outputs.html_url }} | sed "s#/tag/#/download/#")
-          echo "download_url=$url" >> $GITHUB_OUTPUT
-
-      - name: "Checkout serverless-logic-sandbox-deployment"
-        uses: actions/checkout@v3
-        with:
-          path: serverless-logic-sandbox-deployment
-          repository: ${{ env.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO }}
+# jobs:
+#   create_release:
+#     runs-on: ubuntu-latest
+#     outputs:
+#       upload_asset_url: ${{ steps.create_release_draft.outputs.upload_url }}
+#       html_url: ${{ steps.create_release_draft.outputs.html_url }}
+#       id: ${{ steps.create_release_draft.outputs.id }}
+#       commit_sha: ${{ steps.release_draft_commit_sha.outputs.commit_sha }}
+#       download_asset_url: ${{ steps.release_json_ext.outputs.download_url }}
+#     steps:
+#       - name: "Checkout"
+#         uses: actions/checkout@v3
+#         with:
+#           path: kie-tools
+#           repository: ${{ env.KIE_TOOLS_REPO }}
+#           ref: ${{ github.event.inputs.version }}
+#
+#       - name: "Parse `commit_sha`"
+#         id: release_draft_commit_sha
+#         shell: bash
+#         run: |
+#           echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+#
+#       - name: "Check `version` against `package.json.version`"
+#         shell: bash
+#         run: |
+#           cd kie-tools
+#           [ "${{ github.event.inputs.version }}" == "$(node -p "require('./package.json').version")" ]
+#           cd -
+#
+#       - name: "Create Release (draft)"
+#         id: create_release_draft
+#         uses: actions/create-release@v1.1.4
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           tag_name: ${{ github.event.inputs.version }}
+#           release_name: ${{ github.event.inputs.version }} (alpha)
+#           commitish: ${{ github.ref }}
+#           draft: true
+#           prerelease: true
+#
+#       - name: "Generate download URL for Release assets"
+#         id: release_json_ext
+#         shell: bash
+#         run: |
+#           url=$(echo ${{ steps.create_release_draft.outputs.html_url }} | sed "s#/tag/#/download/#")
+#           echo "download_url=$url" >> $GITHUB_OUTPUT
+#
+#       - name: "Checkout serverless-logic-sandbox-deployment"
+#         uses: actions/checkout@v3
+#         with:
+#           path: serverless-logic-sandbox-deployment
+#           repository: ${{ env.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO }}
 
   build_and_publish:
     needs: [create_release]
@@ -81,6 +90,17 @@ jobs:
       commit_sha: ${{ needs.create_release.outputs.commit_sha }}
       download_asset_url: ${{ needs.create_release.outputs.download_asset_url }}
       upload_asset_url: ${{ needs.create_release.outputs.upload_asset_url }}
+    secrets:
+      kie_group_tools_token: ${{ secrets.KIE_GROUP_TOOLS_TOKEN }}
+      gh_token: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build_and_publish:
+    uses: ./.github/workflows/build_and_publish.yml
+    with:
+      dry_run: false
+      environment: staging
+      tag: main
     secrets:
       kie_group_tools_token: ${{ secrets.KIE_GROUP_TOOLS_TOKEN }}
       gh_token: ${{ secrets.GITHUB_TOKEN }}
