@@ -1,0 +1,28 @@
+name: "Build and Publish (Direct Call)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        type: boolean
+        default: true
+      environment:
+        description: Environment for the workflow (dev, staging, prod)
+        required: true
+        default: dev
+      tag:
+        description: Tag to build
+        required: false
+        default: main
+
+jobs:
+  build_and_publish:
+    uses: ./.github/workflows/build_and_publish.yml
+    with:
+      dry_run: ${{ github.event.inputs.dry_run }}
+      environment: ${{ github.event.inputs.environment }}
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
+      kie_group_tools_token: ${{ secrets.KIE_GROUP_TOOLS_TOKEN }}
+      gh_token: ${{ secrets.GITHUB_TOKEN }}
+
