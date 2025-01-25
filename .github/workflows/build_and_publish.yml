@@ -119,7 +119,7 @@ jobs:
           ref: gh-pages
 
       - name: "Update serverless-logic-sandbox-deployment resources"
-        if: github.event_name != 'pull_request' && ${{ !inputs.dry_run }}
+        if: ${{ !inputs.dry_run && github.event_name != 'pull_request' }}
         run: |
           cd serverless-logic-sandbox-deployment
           rm -rf $DEPLOYMENT_DIR
