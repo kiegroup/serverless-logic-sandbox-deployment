@@ -101,10 +101,7 @@ jobs:
 
       - name: "Build serverless-logic-web-tools"
         env:
-          SERVERLESS_LOGIC_WEB_TOOLS__buildInfo: ${{ 
-            (inputs.environment == 'dev' && "${{ steps.version.outputs.version }} (daily-dev) @ ${{ steps.commit_sha.outputs.commit_sha }}" ) ||
-            (inputs.environment == 'staging' && "${{ inputs.tag }} (staging) @ ${{ steps.commit_sha.outputs.commit_sha }}")
-          }}
+          SERVERLESS_LOGIC_WEB_TOOLS__buildInfo: ${{ (inputs.environment == 'dev' && "${{ steps.version.outputs.version }} (daily-dev) @ ${{ steps.commit_sha.outputs.commit_sha }}" ) || (inputs.environment == 'staging' && "${{ inputs.tag }} (staging) @ ${{ steps.commit_sha.outputs.commit_sha }}") }}
         run: |
           cd kie-tools
           pnpm -F @kie-tools/serverless-logic-web-tools... build:prod
