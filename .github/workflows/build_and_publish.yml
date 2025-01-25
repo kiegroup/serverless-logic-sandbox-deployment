@@ -23,7 +23,6 @@ on:
 env:
   KIE_TOOLS_REPO: ${{ vars.KIE_TOOLS_REPO || 'kubesmarts/kie-tools' }}
   SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO || 'kiegroup/serverless-logic-sandbox-deployment' }}
-  DEPLOYMENT_DIR: ${{ (inputs.environment == 'dev' &&  'dev' ) || (inputs.environment == 'staging' &&  'staging/${{ inputs.tag }}' ) || '.' }}
   DASHBUILDER__viewerImageAccount: "kubesmarts"
   DASHBUILDER__viewerImageName: "incubator-kie-dashbuilder-viewer"
   DASHBUILDER__viewerImageRegistry: "quay.io"
@@ -121,6 +120,14 @@ jobs:
       - name: "Update serverless-logic-sandbox-deployment resources"
         if: ${{ !inputs.dry_run && github.event_name != 'pull_request' }}
         run: |
+          if [ "${{ inputs.environment }}" == "dev" ]; then
+            export DEPLOYMENT_DIR="dev"
+          elif [ "${{ inputs.environment }}" == "staging" ]; then
+            export DEPLOYMENT_DIR="staging/${{ inputs.tag }}"
+          else
+            export DEPLOYMENT_DIR="."
+          fi
+          echo "DEPLOYMENT_DIR=$DEPLOYMENT_DIR"
           cd serverless-logic-sandbox-deployment
           rm -rf $DEPLOYMENT_DIR
           mkdir $DEPLOYMENT_DIR
