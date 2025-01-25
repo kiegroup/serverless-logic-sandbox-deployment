@@ -7,14 +7,14 @@ on:
         type: boolean
         required: true
       environment:
-        description: "Environment for the workflow (dev, staging, prod)"
+        description: Environment for the workflow (dev, staging, prod)
         required: true
-        default: "dev"
+        default: dev
         type: string
       tag:
         type: string
         required: false
-        default: "main"
+        default: main
     secrets:
       kie_group_tools_token:
         required: false

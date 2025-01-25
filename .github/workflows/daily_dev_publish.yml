@@ -21,8 +21,8 @@ jobs:
     uses: ./.github/workflows/build_and_publish.yml
     with:
       dry_run: false
-      environment: "dev"
-      tag: "main"
+      environment: dev
+      tag: main
     secrets:
       kie_group_tools_token: ${{ secrets.KIE_GROUP_TOOLS_TOKEN }}
       gh_token: ${{ secrets.GITHUB_TOKEN }}
