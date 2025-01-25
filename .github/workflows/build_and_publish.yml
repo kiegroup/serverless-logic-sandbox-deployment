@@ -130,8 +130,8 @@ jobs:
           fi
           echo "DEPLOYMENT_DIR=$DEPLOYMENT_DIR"
           cd serverless-logic-sandbox-deployment
+          shopt -s extglob
           if [ "${{ inputs.environment }}" == "prod" ]; then
-            shopt -s extglob
             rm -rf -- !("dev"|"staging"|".nojekyll"|"CNAME"|"0.25.0"|"schemas")
           else
             rm -rf $DEPLOYMENT_DIR
