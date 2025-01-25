@@ -12,9 +12,9 @@ concurrency:
   group: ${{ github.event.pull_request && format('daily-dev-publish-pr-{0}', github.event.pull_request.number) || format('daily-dev-publish-ref-{0}', github.ref_name) }}
   cancel-in-progress: true
 
-env:
-  KIE_TOOLS_REPO: ${{ vars.KIE_TOOLS_REPO || 'kubesmarts/kie-tools' }}
-  SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO || 'kiegroup/serverless-logic-sandbox-deployment' }}
+# env:
+#   KIE_TOOLS_REPO: ${{ vars.KIE_TOOLS_REPO || 'kubesmarts/kie-tools' }}
+#   SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO || 'kiegroup/serverless-logic-sandbox-deployment' }}
 
 jobs:
   build_and_publish:
