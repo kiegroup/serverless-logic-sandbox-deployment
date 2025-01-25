@@ -15,6 +15,10 @@ on:
         required: false
         default: main
 
+concurrency:
+  group: custom-build-publish-${{ github.event.inputs.environment }}
+  cancel-in-progress: true
+
 jobs:
   build_and_publish:
     uses: ./.github/workflows/build_and_publish.yml
