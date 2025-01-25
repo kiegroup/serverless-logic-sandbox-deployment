@@ -129,6 +129,8 @@ jobs:
           fi
           echo "DEPLOYMENT_DIR=$DEPLOYMENT_DIR"
           cd serverless-logic-sandbox-deployment
+          shopt -s extglob
+          rm -rf -- !("dev"|"staging"|".nojekyll"|"CNAME"|"0.25.0"|"schemas")
           rm -rf $DEPLOYMENT_DIR
           mkdir -p $DEPLOYMENT_DIR
           cp -r ../kie-tools/packages/serverless-logic-web-tools/dist/* $DEPLOYMENT_DIR
