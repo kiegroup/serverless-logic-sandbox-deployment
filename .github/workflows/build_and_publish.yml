@@ -119,6 +119,7 @@ jobs:
 
       - name: "Update serverless-logic-sandbox-deployment resources"
         if: ${{ !inputs.dry_run && github.event_name != 'pull_request' }}
+        shell: bash
         run: |
           if [ "${{ inputs.environment }}" == "dev" ]; then
             export DEPLOYMENT_DIR="dev"
