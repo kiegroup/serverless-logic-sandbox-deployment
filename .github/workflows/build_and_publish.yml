@@ -23,7 +23,7 @@ on:
 env:
   KIE_TOOLS_REPO: ${{ vars.KIE_TOOLS_REPO || 'kubesmarts/kie-tools' }}
   SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO: ${{ vars.SERVERLESS_LOGIC_SANDBOX_DEPLOYMENT_REPO || 'kiegroup/serverless-logic-sandbox-deployment' }}
-  DEPLOYMENT_DIR: ${{ (inputs.environment == 'dev' &&  "dev" ) || (inputs.environment == 'staging' &&  "staging/${{ inputs.tag }}" ) || "." }}
+  DEPLOYMENT_DIR: ${{ (inputs.environment == 'dev' &&  'dev' ) || (inputs.environment == 'staging' &&  'staging/${{ inputs.tag }}' ) || '.' }}
   DASHBUILDER__viewerImageAccount: "kubesmarts"
   DASHBUILDER__viewerImageName: "incubator-kie-dashbuilder-viewer"
   DASHBUILDER__viewerImageRegistry: "quay.io"
