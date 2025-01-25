@@ -1,4 +1,4 @@
-name: "Build and Publish (Direct Call)"
+name: "Custom version :: Build and Publish"
 
 on:
   workflow_dispatch:
